@@ -12,7 +12,7 @@ namespace filesystem{
     const std::string& file::get_content() const {
         return content;
     }
-    void file::set_content(const std::string& data) {
+    void file::set_content(std::string data) {
         content = std::move(data);
     }
     std::unique_ptr<fsobject> file::clone() {

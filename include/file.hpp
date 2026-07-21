@@ -16,7 +16,7 @@ namespace filesystem{
         std::unique_ptr<fsobject> clone() override;
 
         const std::string& get_content() const;
-        void set_content(const std::string& data);
+        void set_content(std::string data);
     };
 }
 

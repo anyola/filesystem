@@ -14,7 +14,7 @@ namespace filesystem{
 
         std::size_t get_size() const override;
         bool is_directory() const override;
-        std::unique_ptr<fsobject> clone() override;
+        std::unique_ptr<fsobject> clone() const override;
 
         std::vector<fsobject*> find_all();
         std::vector<fsobject*> find_all_current_level();

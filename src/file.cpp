@@ -15,7 +15,7 @@ namespace filesystem{
     void file::set_content(std::string data) {
         content = std::move(data);
     }
-    std::unique_ptr<fsobject> file::clone() {
+    std::unique_ptr<fsobject> file::clone() const {
         return std::make_unique<file>(get_name(), get_content());
     }
 }

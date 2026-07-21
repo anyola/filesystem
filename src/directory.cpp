@@ -13,9 +13,9 @@ namespace filesystem{
     bool directory::is_directory() const {
         return true;
     }
-    std::unique_ptr<fsobject> directory::clone() {
+    std::unique_ptr<fsobject> directory::clone() const {
         std::unique_ptr<directory> copy = std::make_unique<directory>(get_name());
-        for(std::unique_ptr<fsobject>& child : children){
+        for(const std::unique_ptr<fsobject>& child : children){
             copy->add_child(child->clone());
         }
         return copy;

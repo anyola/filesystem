@@ -45,10 +45,11 @@ namespace filesystem{
     bool fsobject::rename(const std::string& new_name) {
         if(is_valid_name(new_name)){
             directory* parent_dir = static_cast<directory*>(get_parent());
-            if(parent_dir && parent_dir->validate_name(new_name)){
-                name = new_name;
-                return true;
+            if(parent_dir && !parent_dir->validate_name(new_name)){
+                return false;
             }
+            name = new_name;
+            return true;
         }
         return false;
     }

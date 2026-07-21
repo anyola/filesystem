@@ -116,8 +116,11 @@ namespace filesystem{
             directory* dir = static_cast<directory*>(object);
             if(dir == &target || dir->is_ancestor(target)) return nullptr;
         }
-        std::unique_ptr<fsobject> removed = parent->remove_child(name);
-        return target.add_child(std::move(removed));
+        if(target.validate_name(name)){
+            std::unique_ptr<fsobject> removed = parent->remove_child(name);
+            return target.add_child(std::move(removed));
+        }
+        return nullptr;
     }
     bool directory::validate_name(const std::string& new_name){
         if(is_directory()){

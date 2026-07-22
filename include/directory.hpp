@@ -17,7 +17,7 @@ namespace filesystem{
         std::unique_ptr<fsobject> clone() const override;
 
         std::vector<fsobject*> find_all();
-        std::vector<fsobject*> find_all_current_level();
+        std::vector<fsobject*> find_all_current_level() const ;
         fsobject* find(const std::string& input_name);
 
         bool has_child(const std::string& child_name);
@@ -25,7 +25,7 @@ namespace filesystem{
         std::unique_ptr<fsobject> remove_child(const std::string& child_name);
         bool is_ancestor(fsobject& object);
         fsobject* move(const std::string& name, directory& target);
-        bool validate_name(const std::string& name);
+        bool validate_name(const std::string& name) const;
     };
 }
 

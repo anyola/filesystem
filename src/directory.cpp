@@ -32,9 +32,9 @@ namespace filesystem{
         }
         return result;
     }
-    std::vector<fsobject*> directory::find_all_current_level(){
+    std::vector<fsobject*> directory::find_all_current_level() const {
         std::vector<fsobject*> result;
-        for(std::unique_ptr<fsobject>& child : children){
+        for(const std::unique_ptr<fsobject>& child : children){
             result.push_back(child.get());
         }
         return result;
@@ -122,13 +122,11 @@ namespace filesystem{
         }
         return nullptr;
     }
-    bool directory::validate_name(const std::string& new_name){
-        if(is_directory()){
-            std::vector<fsobject*> current_level = find_all_current_level();
-            for(fsobject* child : current_level){
-                if(child->get_name() == new_name){
-                    return false;
-                }
+    bool directory::validate_name(const std::string& new_name) const {
+        std::vector<fsobject*> current_level = find_all_current_level();
+        for(fsobject* child : current_level){
+            if(child->get_name() == new_name){
+                return false;
             }
         }
         return true;

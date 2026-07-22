@@ -108,16 +108,19 @@ namespace filesystem{
         return false;
     }
     fsobject* directory::move(const std::string& name, directory& target){
-        fsobject* object = find(name);
-        if(!object) return nullptr;
-        directory* parent = static_cast<directory*>(object->get_parent());
-        if(!parent) return nullptr;
-        if(object->is_directory()){
+        fsobject* object = nullptr;
+        for(std::unique_ptr<fsobject>& child : children) {
+            if(child->get_name() == name){
+                object = child.get();
+                break;
+            }
+        }
+        if(object && object->is_directory()){
             directory* dir = static_cast<directory*>(object);
             if(dir == &target || dir->is_ancestor(target)) return nullptr;
         }
         if(target.validate_name(name)){
-            std::unique_ptr<fsobject> removed = parent->remove_child(name);
+            std::unique_ptr<fsobject> removed = remove_child(name);
             return target.add_child(std::move(removed));
         }
         return nullptr;

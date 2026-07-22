@@ -48,7 +48,7 @@ namespace filesystem{
             if(child->is_directory()){
                 directory* dir = static_cast<directory*>(child.get());
                 fsobject* result = dir->find(input_name);
-                if(result){
+                if(result != nullptr){
                     return result;
                 }
             }
@@ -117,7 +117,9 @@ namespace filesystem{
         }
         if(object && object->is_directory()){
             directory* dir = static_cast<directory*>(object);
-            if(dir == &target || dir->is_ancestor(target)) return nullptr;
+            if(dir == &target || dir->is_ancestor(target)) {
+                return nullptr;
+            }
         }
         if(target.validate_name(name)){
             std::unique_ptr<fsobject> removed = remove_child(name);

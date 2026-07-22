@@ -12,13 +12,13 @@ namespace filesystem{
     public:
         explicit directory(std::string name_);
 
-        std::size_t get_size() const override;
-        bool is_directory() const override;
-        std::unique_ptr<fsobject> clone() const override;
+        [[nodiscard]] std::size_t get_size() const override;
+        [[nodiscard]] bool is_directory() const override;
+        [[nodiscard]] std::unique_ptr<fsobject> clone() const override;
         void print(std::ostream& os) const override;
 
         std::vector<fsobject*> find_all();
-        std::vector<fsobject*> find_all_current_level() const ;
+        [[nodiscard]] std::vector<fsobject*> find_all_current_level() const ;
         fsobject* find(const std::string& input_name);
 
         bool has_child(const std::string& child_name);
@@ -26,7 +26,7 @@ namespace filesystem{
         std::unique_ptr<fsobject> remove_child(const std::string& child_name);
         bool is_ancestor(fsobject& object);
         fsobject* move(const std::string& name, directory& target);
-        bool validate_name(const std::string& name) const;
+        [[nodiscard]] bool validate_name(const std::string& name) const;
     };
 }
 

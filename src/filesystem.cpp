@@ -19,7 +19,7 @@ namespace filesystem{
             current_path.push_back(current);
             current = current->get_parent();
         }
-        std::string result = "";
+        std::string result;
         while(!current_path.empty()){
             result += "/";
             result += current_path.back()->get_name();
@@ -45,7 +45,7 @@ namespace filesystem{
     bool fsobject::rename(const std::string& new_name) {
         if(is_valid_name(new_name)){
             directory* parent_dir = static_cast<directory*>(get_parent());
-            if(parent_dir && !parent_dir->validate_name(new_name)){
+            if(parent_dir != nullptr && !parent_dir->validate_name(new_name)){
                 return false;
             }
             name = new_name;

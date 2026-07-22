@@ -27,6 +27,7 @@ namespace filesystem {
         virtual std::size_t get_size() const = 0;
         virtual bool is_directory() const = 0;
         virtual std::unique_ptr<fsobject> clone() const = 0;
+        virtual void print(std::ostream& os) const = 0;
         static bool is_valid_name(const std::string& new_name);
     };
 }

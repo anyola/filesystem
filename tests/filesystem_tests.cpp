@@ -602,3 +602,66 @@ TEST(EdgeCaseTest, StressFindAllOnWideAndDeepTree) {
     auto all = root.find_all();
     EXPECT_EQ(all.size(), static_cast<std::size_t>(branches + branches * per_branch));
 }
+
+TEST(PrintTest, FilePrintsNameAndSize) {
+    file f("test.txt", "hello");
+    std::ostringstream oss;
+    f.print(oss);
+    std::string output = oss.str();
+    EXPECT_NE(output.find("test.txt"), std::string::npos);
+    EXPECT_NE(output.find("5 bytes"), std::string::npos);
+}
+
+TEST(PrintTest, DirectoryPrintsNameAndSize) {
+    directory dir("root");
+    std::ostringstream oss;
+    dir.print(oss);
+    std::string output = oss.str();
+    EXPECT_NE(output.find("root"), std::string::npos);
+    EXPECT_NE(output.find("0 bytes"), std::string::npos);
+}
+
+TEST(PrintTest, DirectoryPrintsChildren) {
+    directory root("root");
+    root.add_child(std::make_unique<file>("a.txt", "abc"));
+    root.add_child(std::make_unique<file>("b.txt", "12345"));
+    
+    std::ostringstream oss;
+    root.print(oss);
+    std::string output = oss.str();
+    
+    EXPECT_NE(output.find("a.txt"), std::string::npos);
+    EXPECT_NE(output.find("b.txt"), std::string::npos);
+}
+
+TEST(PrintTest, NestedDirectoryPrintsAllLevels) {
+    directory root("root");
+    auto* sub = static_cast<directory*>(
+        root.add_child(std::make_unique<directory>("sub")));
+    sub->add_child(std::make_unique<file>("deep.txt", "x"));
+    
+    std::ostringstream oss;
+    root.print(oss);
+    std::string output = oss.str();
+    
+    EXPECT_NE(output.find("root"), std::string::npos);
+    EXPECT_NE(output.find("sub"), std::string::npos);
+    EXPECT_NE(output.find("deep.txt"), std::string::npos);
+}
+
+TEST(PrintTest, PrintDoesNotCrashOnEmptyDirectory) {
+    directory dir("empty");
+    std::ostringstream oss;
+    EXPECT_NO_THROW(dir.print(oss));
+}
+
+TEST(PrintTest, PrintDoesNotCrashOnDeepTree) {
+    directory root("root");
+    directory* current = &root;
+    for(int i = 0; i < 100; ++i) {
+        current = static_cast<directory*>(
+            current->add_child(std::make_unique<directory>("d" + std::to_string(i))));
+    }
+    std::ostringstream oss;
+    EXPECT_NO_THROW(root.print(oss));
+}

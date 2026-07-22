@@ -134,5 +134,11 @@ namespace filesystem{
         }
         return true;
     }
+    void directory::print(std::ostream& os) const {
+    os << get_name() << " (" << get_size() << " bytes)\n";
+    for(const std::unique_ptr<fsobject>& child : children){
+        child->print(os);
+    }
+}
         
 }

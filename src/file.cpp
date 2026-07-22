@@ -18,4 +18,7 @@ namespace filesystem{
     std::unique_ptr<fsobject> file::clone() const {
         return std::make_unique<file>(get_name(), get_content());
     }
+    void file::print(std::ostream& os) const {
+        os << get_name() << "(" << get_size() << " bytes)" << '\n';
+    }
 }

@@ -1,5 +1,8 @@
 #include "directory.hpp"
 
+#include <sstream>
+
+
 namespace filesystem{
     directory::directory(std::string name_) : fsobject(std::move(name_)) {}
 
@@ -12,6 +15,9 @@ namespace filesystem{
     }
     bool directory::is_directory() const {
         return true;
+    }
+    bool directory::is_symlink() const {
+        return false;
     }
     std::unique_ptr<fsobject> directory::clone() const {
         std::unique_ptr<directory> copy = std::make_unique<directory>(get_name());
@@ -54,6 +60,37 @@ namespace filesystem{
             }
         }
         return nullptr;
+    }
+    fsobject* directory::find_by_path(std::string input_name){
+        if(input_name.empty()){
+            return nullptr;
+        }
+        if(input_name[0] == '/'){
+            input_name = input_name.substr(1);
+        }
+        std::stringstream ss(input_name);
+        std::string part;
+        fsobject* found = nullptr;
+        fsobject* current = this;
+        
+        while(std::getline(ss, part, '/')){
+            if(!current->is_directory()) {
+                return nullptr;
+            }
+            directory* dir = static_cast<directory*>(current);
+            for(std::unique_ptr<fsobject>& child : dir->children){
+                if(part == child->get_name()){
+                    found = child.get();
+                    break;
+                }
+            }
+            if(found == nullptr){
+                return nullptr;
+            }
+            current = found;
+        }
+        return current;
+
     }
     bool directory::has_child(const std::string& child_name){
         for(std::unique_ptr<fsobject>& child : children){

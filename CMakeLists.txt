@@ -14,6 +14,7 @@ add_executable(filesystem
     src/filesystem.cpp
     src/file.cpp
     src/directory.cpp
+    src/symlink.cpp
 )
 
 target_include_directories(filesystem PRIVATE include)
@@ -51,6 +52,7 @@ add_executable(filesystem_tests
     src/filesystem.cpp
     src/file.cpp
     src/directory.cpp
+    src/symlink.cpp
     tests/filesystem_tests.cpp
 )
 

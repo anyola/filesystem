@@ -9,6 +9,9 @@ namespace filesystem{
     bool file::is_directory() const {
         return false;
     }
+    bool file::is_symlink() const {
+        return false;
+    }
     const std::string& file::get_content() const {
         return content;
     }

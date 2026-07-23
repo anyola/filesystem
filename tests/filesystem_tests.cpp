@@ -2,6 +2,7 @@
 
 #include "directory.hpp"
 #include "file.hpp"
+#include "symlink.hpp"
 
 using filesystem::directory;
 using filesystem::file;
@@ -664,4 +665,95 @@ TEST(PrintTest, PrintDoesNotCrashOnDeepTree) {
     }
     std::ostringstream oss;
     EXPECT_NO_THROW(root.print(oss));
+}
+
+TEST(SymlinkTest, ResolvesToTargetFile) {
+    directory root("root");
+    auto* docs = static_cast<directory*>(root.add_child(std::make_unique<directory>("docs")));
+    docs->add_child(std::make_unique<file>("report.txt", "hi"));
+    root.add_child(std::make_unique<filesystem::symlink>("link", "/docs/report.txt"));
+
+    auto* link = static_cast<filesystem::symlink*>(root.find("link"));
+    ASSERT_NE(link, nullptr);
+    ASSERT_TRUE(link->is_symlink());
+
+    fsobject* resolved = link->resolve();
+    ASSERT_NE(resolved, nullptr);
+    EXPECT_EQ(resolved->get_name(), "report.txt");
+}
+
+TEST(SymlinkTest, BrokenLinkResolvesToNullptr) {
+    directory root("root");
+    root.add_child(std::make_unique<filesystem::symlink>("dead_link", "/nowhere/nothing.txt"));
+
+    auto* link = static_cast<filesystem::symlink*>(root.find("dead_link"));
+    ASSERT_NE(link, nullptr);
+    EXPECT_EQ(link->resolve(), nullptr);
+}
+
+TEST(SymlinkTest, FollowsChainOfSymlinks) {
+    directory root("root");
+    root.add_child(std::make_unique<file>("real.txt", "data"));
+    root.add_child(std::make_unique<filesystem::symlink>("link_b", "/real.txt"));
+    root.add_child(std::make_unique<filesystem::symlink>("link_a", "/link_b"));
+
+    auto* link_a = static_cast<filesystem::symlink*>(root.find("link_a"));
+    ASSERT_NE(link_a, nullptr);
+    fsobject* resolved = link_a->resolve();
+    ASSERT_NE(resolved, nullptr);
+    EXPECT_EQ(resolved->get_name(), "real.txt");
+}
+
+TEST(SymlinkTest, DetectsCycleAndReturnsNullptr) {
+    directory root("root");
+    root.add_child(std::make_unique<filesystem::symlink>("a", "/b"));
+    root.add_child(std::make_unique<filesystem::symlink>("b", "/a"));
+
+    auto* link_a = static_cast<filesystem::symlink*>(root.find("a"));
+    ASSERT_NE(link_a, nullptr);
+    EXPECT_EQ(link_a->resolve(), nullptr);
+}
+
+TEST(SymlinkTest, IsDirectoryIsAlwaysFalse) {
+    directory root("root");
+    root.add_child(std::make_unique<directory>("real_dir"));
+    root.add_child(std::make_unique<filesystem::symlink>("dir_link", "/real_dir"));
+
+    auto* link = static_cast<filesystem::symlink*>(root.find("dir_link"));
+    ASSERT_NE(link, nullptr);
+    EXPECT_FALSE(link->is_directory());
+    EXPECT_TRUE(link->is_symlink());
+}
+
+TEST(SymlinkTest, CloneIsShallow) {
+    directory root("root");
+    root.add_child(std::make_unique<file>("target.txt", "content"));
+    root.add_child(std::make_unique<filesystem::symlink>("link", "/target.txt"));
+
+    auto* original = static_cast<filesystem::symlink*>(root.find("link"));
+    auto cloned = original->clone();
+
+    ASSERT_TRUE(cloned->is_symlink());
+    auto* cloned_link = static_cast<filesystem::symlink*>(cloned.get());
+    EXPECT_EQ(cloned_link->get_target_path(), "/target.txt");
+}
+
+TEST(SymlinkTest, SymlinkToSubdirDoesNotBreakIsAncestor) {
+    directory root("root");
+    auto* sub = static_cast<directory*>(root.add_child(std::make_unique<directory>("sub")));
+    sub->add_child(std::make_unique<filesystem::symlink>("self_link", "/sub"));
+
+    EXPECT_TRUE(root.is_ancestor(*sub));
+    auto cloned = root.clone();
+    EXPECT_NE(cloned, nullptr);
+}
+
+TEST(SymlinkTest, GetSizeReturnsTargetPathLength) {
+    directory root("root");
+    root.add_child(std::make_unique<file>("big.txt", "1234567890"));
+    root.add_child(std::make_unique<filesystem::symlink>("link", "/big.txt"));
+
+    auto* link = static_cast<filesystem::symlink*>(root.find("link"));
+    ASSERT_NE(link, nullptr);
+    EXPECT_EQ(link->get_size(), 8U);
 }

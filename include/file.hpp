@@ -13,6 +13,7 @@ namespace filesystem{
         
         [[nodiscard]] std::size_t get_size() const override;
         [[nodiscard]] bool is_directory() const override;
+        [[nodiscard]] bool is_symlink() const override;
         [[nodiscard]] std::unique_ptr<fsobject> clone() const override;
         void print(std::ostream& os) const override;
 

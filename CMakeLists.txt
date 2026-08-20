@@ -10,7 +10,6 @@ set(MY_CLANG_TIDY
 )
 
 add_executable(filesystem
-    src/main.cpp
     src/filesystem.cpp
     src/file.cpp
     src/directory.cpp

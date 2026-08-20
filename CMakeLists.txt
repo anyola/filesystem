@@ -38,14 +38,28 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         -fsanitize=undefined
         -fno-omit-frame-pointer
     )
+
     target_link_options(filesystem PRIVATE
         -fsanitize=address
         -fsanitize=undefined
     )
 endif()
 
-add_subdirectory(googletest)
 
+# GoogleTest
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(googletest)
+
+
+# Tests
 enable_testing()
 
 add_executable(filesystem_tests
@@ -77,4 +91,5 @@ target_compile_options(filesystem_tests PRIVATE
 )
 
 include(GoogleTest)
+
 gtest_discover_tests(filesystem_tests)

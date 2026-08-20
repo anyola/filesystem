@@ -92,6 +92,16 @@ namespace filesystem{
         return current;
 
     }
+    
+    fsobject* directory::find_direct_child(const std::string& name){
+        for(std::unique_ptr<fsobject>& child : children){
+            if(child->get_name() == name){
+                return child.get();
+            }
+        }
+        return nullptr;
+    }
+
     bool directory::has_child(const std::string& child_name){
         for(std::unique_ptr<fsobject>& child : children){
             if(child->get_name() == child_name){

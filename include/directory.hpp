@@ -22,6 +22,7 @@ namespace filesystem{
         [[nodiscard]] std::vector<fsobject*> find_all_current_level() const ;
         fsobject* find(const std::string& input_name);
         fsobject* find_by_path(std::string input_name);
+        fsobject* find_direct_child(const std::string& name);
 
         bool has_child(const std::string& child_name);
         fsobject* add_child(std::unique_ptr<fsobject> object);

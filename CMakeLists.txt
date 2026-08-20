@@ -9,48 +9,13 @@ set(MY_CLANG_TIDY
     -checks=performance-*,bugprone*
 )
 
-add_executable(filesystem
-    src/filesystem.cpp
-    src/file.cpp
-    src/directory.cpp
-    src/symlink.cpp
-)
-
-target_include_directories(filesystem PRIVATE include)
-
-set_target_properties(filesystem PROPERTIES
-    CXX_CLANG_TIDY "${MY_CLANG_TIDY}"
-)
-
-target_compile_options(filesystem PRIVATE
-    -Wall
-    -Wextra
-    -Werror
-    -Wpedantic
-    -Wconversion
-    -Wsign-conversion
-)
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(filesystem PRIVATE
-        -fsanitize=address
-        -fsanitize=undefined
-        -fno-omit-frame-pointer
-    )
-
-    target_link_options(filesystem PRIVATE
-        -fsanitize=address
-        -fsanitize=undefined
-    )
-endif()
-
-
 # GoogleTest
 include(FetchContent)
 
 FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -88,6 +53,19 @@ target_compile_options(filesystem_tests PRIVATE
     -Wconversion
     -Wsign-conversion
 )
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(filesystem_tests PRIVATE
+        -fsanitize=address
+        -fsanitize=undefined
+        -fno-omit-frame-pointer
+    )
+
+    target_link_options(filesystem_tests PRIVATE
+        -fsanitize=address
+        -fsanitize=undefined
+    )
+endif()
 
 include(GoogleTest)
 

@@ -1,4 +1,5 @@
 # Иерархическая файловая система (C++20)
+[![CI](https://github.com/anyola/filesystem/actions/workflows/ci.yml/badge.svg)](https://github.com/anyola/filesystem/actions/workflows/ci.yml)
 
 Реализация иерархической файловой системы на **C++20** с полиморфной иерархией объектов и явным владением через `std::unique_ptr`.
 
